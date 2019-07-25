@@ -13,12 +13,23 @@ import RxCocoa
 class ViewController: UIViewController {
     let disposeBag = DisposeBag()
 
+    @IBOutlet weak var loginBtn: UIButton!
+    @IBOutlet weak var pwdLabel: UILabel!
+    @IBOutlet weak var userNameLabel: UILabel!
+    @IBOutlet weak var pwdTf: UITextField!
+    @IBOutlet weak var userNameTf: UITextField!
+    let userNameMinCount = 6
+    let passwordMinCount = 10
+
+
     var person = Person(name: "")
     let btn = UIButton()
     let tf = UITextField()
     let scrollView = UIScrollView()
     var timer: Observable<Int>!
     var label = UILabel()
+
+
 
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -45,31 +56,70 @@ class ViewController: UIViewController {
 
             })*/
 
+
+
+
+        /*
         // 1、创建序列
-        let ob = Observable<Any>.create { (obserber) -> Disposable in
+        let ob = Observable<Any>.create { (observer) -> Disposable in
             // 3、发送信号
-            obserber.onNext("发送信号")
+            observer.onNext("发送信号")
             // 2取1
-            obserber.onCompleted()
-            obserber.onError(NSError.init(domain: "andy", code: 1006, userInfo: nil))
+            observer.onCompleted()
+
+            observer.onError(NSError.init(domain: "andy", code: 1006, userInfo: nil))
 
             return Disposables.create()
         }
 
+        /*
+        Observable<Any>.create { (obser) -> Disposable in
+            // 这个闭包什么时候调用的呢？
+
+            return Disposables.create()
+        }*/
+
         // 2、订阅信号
-        ob.subscribe(onNext: { (text) in
-            print("订阅到text")
+        let _ = ob.subscribe(onNext: { (text) in
+            print("text",text)
         }, onError: { (error) in
-            print("订阅到error")
+            print("error",error)
         }, onCompleted: {
             print("订阅到完成")
         }) {
             print("销毁")
+        }*/
+
+
+        // RxSwiftDemo
+        setupLogin()
+    }
+
+
+
+    /// RxSwiftDemo
+    func setupLogin() {
+        let usernameVaild = userNameTf.rx.text.orEmpty.map { (text) in
+            return text.count > self.userNameMinCount
         }
 
+        usernameVaild.bind(to: userNameLabel.rx.isHidden).disposed(by: disposeBag)
+        usernameVaild.bind(to: pwdTf.rx.isEnabled).disposed(by: disposeBag)
 
+        let pwdVaild = pwdTf.rx.text.orEmpty.map { (text) in
+            return text.count > self.passwordMinCount
+        }
+        pwdVaild.bind(to: pwdLabel.rx.isHidden).disposed(by: disposeBag)
 
+        Observable.combineLatest(usernameVaild, pwdVaild) { $0 && $1}
+            .bind(to: loginBtn.rx.isEnabled)
+            .disposed(by: disposeBag)
+
+        loginBtn.rx.tap.subscribe(onNext: { () in
+            print("点击一下")
+        }).disposed(by: disposeBag)
     }
+
 
     override func touchesBegan(_ touches: Set<UITouch>, with event: UIEvent?) {
         person.name = person.name + "23456"
@@ -81,7 +131,6 @@ class ViewController: UIViewController {
 
     func setupButton() {
 
-//        self.btn.addTarget(<#T##target: Any?##Any?#>, action: <#T##Selector#>, for: <#T##UIControlEvents#>)
 
         self.btn.rx.tap
             .subscribe(onNext: { () in
