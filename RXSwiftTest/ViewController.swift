@@ -29,7 +29,9 @@ class ViewController: UIViewController {
     var timer: Observable<Int>!
     var label = UILabel()
 
+    var gcdtimer:DispatchSourceTimer?
 
+ 
 
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -57,7 +59,7 @@ class ViewController: UIViewController {
             })*/
 
 
-
+        // let ob = AnonymousObservable
 
         /*
         // 1、创建序列
@@ -92,9 +94,39 @@ class ViewController: UIViewController {
 
 
         // RxSwiftDemo
-        setupLogin()
+       // setupLogin()
+
+
+        // timer
+        //testTimer()
+
+
     }
 
+
+
+//    func dealWithData(imputText: String) -> Observable<Any>
+//    {
+//
+//        return Disposables.create()
+//    }
+
+
+    func array() {
+        let arr = ["123","234"]
+
+
+    }
+
+    /// GCD timer
+    func testTimer() {
+        gcdtimer = DispatchSource.makeTimerSource()
+        gcdtimer?.schedule(deadline: DispatchTime.now(), repeating: 1)
+        gcdtimer?.setEventHandler(handler: {
+            print("=====")
+        })
+        gcdtimer?.resume()
+    }
 
 
     /// RxSwiftDemo
